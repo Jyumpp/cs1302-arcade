@@ -17,3 +17,14 @@ Here is a sample entry (delete this line; also: feel free to copy/paste/modify):
    first, but now that we've settled on a regular day/time things are looking
    great! 
 
+
+## FRI 2018-11-30 @ 5:38 PM EST
+
+1. **DONE:** Project cloned and set up for commits, pushes, and pulls. Both games started with
+   proper class structure.
+
+2. **TODO:** Work on Tetris gravity and translating checkers rules to game function.
+
+3. **PROB:** Took a bit of time to set up proper git tools for group version control,
+   as well as working on making sure the project would be reasonably structured for
+   multiple people's use.

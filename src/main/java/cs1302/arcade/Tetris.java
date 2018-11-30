@@ -6,6 +6,7 @@ public class Tetris
 	private byte[][] stationaryStage = new byte[10][20];
 	private byte[][] fallingStage = new byte[10][20];
 	private Tetromino currentFalling;
+
 	//test
 	private enum Tetromino
 	{
