@@ -5,16 +5,18 @@ import java.util.Random;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Group;
+import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
+import javafx.stage.Modality;
 
 public class ArcadeApp extends Application {
 
     Random rng = new Random();
-
+    public VBox vbox = null;
     @Override
     public void start(Stage stage) {
 
@@ -24,11 +26,12 @@ public class ArcadeApp extends Application {
 	 * (rectangle) in a group. 
 	 */
 	
-	Group group = new Group();           // main container
-	Rectangle r = new Rectangle(20, 20); // some rectangle
+	this.vbox = new VBox();// main container
+
+    	/*Rectangle r = new Rectangle(20, 20); // some rectangle
 	r.setX(50);                          // 50px in the x direction (right)
 	r.setY(50);                          // 50ps in the y direction (down)
-	group.getChildren().add(r);          // add to main container
+	vbox.getChildren().add(r);          // add to main container
 	
 	// when the user clicks on the rectangle, send to random position
 	r.setOnMouseClicked(event -> {
@@ -38,22 +41,24 @@ public class ArcadeApp extends Application {
 	    });
 
 	// when the user presses left and right, move the rectangle
-	group.setOnKeyPressed(event -> {
+	vbox.setOnKeyPressed(event -> {
 		System.out.println(event);
 		if (event.getCode() == KeyCode.LEFT)  r.setX(r.getX() - 10.0);
 		if (event.getCode() == KeyCode.RIGHT) r.setX(r.getX() + 10.0);
 		// TODO bounds checking
 	    });
-
-        Scene scene = new Scene(group, 640, 480);
-        stage.setTitle("cs1302-arcade!");
+	*/
+	menu();
+	Scene scene = new Scene(vbox, 640, 480);
+	stage.setTitle("Hunter and Calvin's Arcade!");
         stage.setScene(scene);
 	stage.sizeToScene();
         stage.show();
 
+	
 	// the group must request input focus to receive key events
 	// @see https://docs.oracle.com/javase/8/javafx/api/javafx/scene/Node.html#requestFocus--
-	group.requestFocus();
+	vbox.requestFocus();
 
     } // start
 
@@ -69,5 +74,34 @@ public class ArcadeApp extends Application {
 	} // try
     } // main
 
+    public void menu(){
+
+	Button tetris = new Button("Tetris");
+	Button checkers = new Button("Checkers");
+	vbox.getChildren().addAll(tetris, checkers);
+	//getChildren().add(vbox);
+	tetris.setOnAction(e -> {
+		VBox v = new VBox();
+		Stage stage = new Stage();
+		Scene scene = new Scene(v);
+		stage.setResizable(false);
+		stage.setTitle("TETRIS!");
+		stage.setScene(scene);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.show();
+	    });
+	checkers.setOnAction(e -> {
+		VBox v = new VBox();
+		Stage stage = new Stage();
+		Scene scene = new Scene(v);
+		stage.setResizable(false);
+		stage.setTitle("CHECKERS!");
+		stage.setScene(scene);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.show();	
+	    });
+	
+    } //menu
+    
 } // ArcadeApp
 
