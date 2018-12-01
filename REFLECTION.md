@@ -18,7 +18,7 @@ Here is a sample entry (delete this line; also: feel free to copy/paste/modify):
    great! 
 
 
-## FRI 2018-11-30 @ 5:38 PM EST
+## FRI 2018-11-30 @ 10:48 PM EST
 
 1. **DONE:** Project cloned and set up for commits, pushes, and pulls. Both games started with
    proper class structure.
