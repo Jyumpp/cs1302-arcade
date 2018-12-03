@@ -79,7 +79,7 @@ public class ArcadeApp extends Application {
 	Button tetris = new Button("Tetris");
 	Button checkers = new Button("Checkers");
 	vbox.getChildren().addAll(tetris, checkers);
-	//getChildren().add(vbox);
+
 	tetris.setOnAction(e -> {
 		VBox v = new VBox();
 		Stage stage = new Stage();
@@ -94,17 +94,16 @@ public class ArcadeApp extends Application {
 
 	    });
 	checkers.setOnAction(e -> {
-		VBox v = new VBox();
-		Stage stage = new Stage();
-		Scene scene = new Scene(v);
-		stage.setResizable(false);
-		stage.setTitle("CHECKERS!");
-		stage.setScene(scene);
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.show();
+//		VBox v = new VBox();
+//		Stage stage = new Stage();
+//		Scene scene = new Scene(v);
+//		stage.setResizable(false);
+//		stage.setTitle("CHECKERS!");
+//		stage.setScene(scene);
+//		stage.initModality(Modality.APPLICATION_MODAL);
+//		stage.show();
 
 		Checkers c = new Checkers(stage);
-
 
 	    });
 	
