@@ -76,34 +76,34 @@ public class ArcadeApp extends Application {
 
     public void menu(){
 
-	Button tetris = new Button("Tetris");
-	Button checkers = new Button("Checkers");
-	vbox.getChildren().addAll(tetris, checkers);
+		Button tetris = new Button("Tetris");
+		Button checkers = new Button("Checkers");
+		vbox.getChildren().addAll(tetris, checkers);
 
-	tetris.setOnAction(e -> {
-		VBox v = new VBox();
-		Stage stage = new Stage();
-		Scene scene = new Scene(v);
-		stage.setResizable(false);
-		stage.setTitle("TETRIS!");
-		stage.setScene(scene);
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.show();
+		tetris.setOnAction(e -> {
+			VBox v = new VBox();
+			Stage stage = new Stage();
+			Scene scene = new Scene(v);
+			stage.setResizable(false);
+			stage.setTitle("TETRIS!");
+			stage.setScene(scene);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.show();
 		/*
 		Tetris t = new Tetris(stage);
 		*/
-	    });
-	checkers.setOnAction(e -> {
-//		VBox v = new VBox();
-//		Stage stage = new Stage();
-//		Scene scene = new Scene(v);
-//		stage.setResizable(false);
-//		stage.setTitle("CHECKERS!");
-//		stage.setScene(scene);
-//		stage.initModality(Modality.APPLICATION_MODAL);
-//		stage.show();
+		});
+		checkers.setOnAction(e -> {
+			VBox v = new VBox();
+			Stage stage = new Stage();
+			Scene scene = new Scene(v);
+			stage.setResizable(false);
+			stage.setTitle("CHECKERS!");
+			stage.setScene(scene);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.show();
 
-		Checkers c = new Checkers(stage);
+			Checkers c = new Checkers(stage);
 
 	    });
 	
