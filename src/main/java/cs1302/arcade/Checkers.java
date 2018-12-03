@@ -25,7 +25,7 @@ public class Checkers extends Application {
 
         Pane root = new Pane();
         root.setPrefSize(800,800);
-        vbox.getChildren()addAll()
+        vbox.getChildren()addAll();
         return vbox;
 
     } //board
