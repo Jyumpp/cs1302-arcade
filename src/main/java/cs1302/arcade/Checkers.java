@@ -13,7 +13,6 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
-
 public class Checkers {
 
     Stage stage;
@@ -33,11 +32,6 @@ public class Checkers {
         root.setPrefSize(800, 800);
         Button b = new Button("test");
         vbox.getChildren().addAll();
-        Circle circle = new Circle(100.0, 100.0, 25.0, Color.INDIANRED);
-        circle.setCenterX(100.0);
-        circle.setCenterY(100.0);
-        circle.setRadius(25.0);
-        root.getChildren().addAll(circle);
 
         Scene s = new Scene(root);
         stage.setScene(s);
