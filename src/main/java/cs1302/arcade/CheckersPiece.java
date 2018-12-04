@@ -3,6 +3,7 @@ package cs1302.arcade;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+
 //in progress 12:36am 12/4
 public class CheckersPiece extends StackPane {
 

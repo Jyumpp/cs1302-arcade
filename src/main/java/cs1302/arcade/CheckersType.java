@@ -1,4 +1,5 @@
 package cs1302.arcade;
+
 /**
  * Class that lists the types of pieces that exist. (Maybe make in CheckerPiece.java?)
  **/
@@ -9,7 +10,7 @@ public enum CheckersType {
     final int direction;
 
 
-    CheckersType(int direction){
+    CheckersType(int direction) {
         this.direction = direction;
     } //CheckersPiece
 
