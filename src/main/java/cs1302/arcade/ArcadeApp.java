@@ -89,9 +89,9 @@ public class ArcadeApp extends Application {
 		stage.setScene(scene);
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.show();
-		/*
+		
 		Tetris t = new Tetris(stage);
-		*/
+
 	    });
 	checkers.setOnAction(e -> {
 		VBox v = new VBox();
