@@ -94,14 +94,14 @@ public class ArcadeApp extends Application {
 		*/
 	    });
 	checkers.setOnAction(e -> {
-//		VBox v = new VBox();
-//		Stage stage = new Stage();
-//		Scene scene = new Scene(v);
-//		stage.setResizable(false);
-//		stage.setTitle("CHECKERS!");
-//		stage.setScene(scene);
-//		stage.initModality(Modality.APPLICATION_MODAL);
-//		stage.show();
+		VBox v = new VBox();
+		Stage stage = new Stage();
+		Scene scene = new Scene(v);
+		stage.setResizable(false);
+		stage.setTitle("CHECKERS!");
+		stage.setScene(scene);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.show();
 
 		Checkers c = new Checkers(stage);
 

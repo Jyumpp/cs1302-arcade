@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -13,26 +14,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 
-public class Checkers /*extends Application*/ {
+public class Checkers {
 
     Stage stage;
     private int board[][];
-
-    //default constructor
-//    public Checkers() {
-//        stage.initModality(Modality.APPLICATION_MODAL);
-//        start(stage);
-//    } //Checkers
-
-
-
-//    public void start(Stage stage) {
-//        this.stage = stage;
-//        Scene scene = new Scene(board());
-//        stage.setTitle("CHECKERS!");
-//        stage.setScene(scene);
-//        stage.show();
-//    } //start
 
     public Checkers(Stage stage) {
         System.out.println("test");
@@ -45,10 +30,10 @@ public class Checkers /*extends Application*/ {
 
         VBox vbox = new VBox();
         Pane root = new Pane();
-        root.setPrefSize(800,800);
+        root.setPrefSize(800, 800);
         Button b = new Button("test");
         vbox.getChildren().addAll();
-        Circle circle = new Circle(100.0, 100.0, 25.0,  );
+        Circle circle = new Circle(100.0, 100.0, 25.0, Color.INDIANRED);
         circle.setCenterX(100.0);
         circle.setCenterY(100.0);
         circle.setRadius(25.0);
@@ -59,6 +44,7 @@ public class Checkers /*extends Application*/ {
 
 
     } //board
+
     public static void main(String[] args) {
         try {
             Application.launch(args);
