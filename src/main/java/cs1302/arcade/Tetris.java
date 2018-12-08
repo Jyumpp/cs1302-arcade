@@ -3,189 +3,292 @@ package cs1302.arcade;
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-public class Tetris {
 
-    private byte[][] stationaryStage = new byte[10][20];
-    private byte[][] fallingStage = new byte[10][20];
-    private Tetromino currentFalling;
-    private long freeTime = 1000;
 
-    private LongProperty dropTimer = new SimpleLongProperty(0);
+public class Tetris
+{
+	private byte[][] stationaryStage = new byte[10][20];
+	private byte[][] fallingStage = new byte[10][20];
+	private Tetromino currentFalling;
+	private long freeTime = 1000;
+	private final int LEFT = -1, RIGHT = 1;
 
-    Tetris(Stage stage) {
-        init();
-    }
+	private LongProperty dropTimer = new SimpleLongProperty(0);
 
-    private enum Tetromino {
-        I, J, L, O, S, T, Z;
+	EventHandler<KeyEvent> keyboardEvent = new EventHandler<KeyEvent>()
+	{
+		@Override
+		public void handle(KeyEvent event)
+		{
+			switch (event.getCode()) {
+				case LEFT:
+					tryMove(LEFT);
+					break;
+				case RIGHT:
+					tryMove(RIGHT);
+					break;
+				default:
+					break;
+			}
+		}
+	};
 
-        int rotation = 0;
-        int xPos = 0;
-        int yPos = 0;
-        byte[][] tetromino;
+	Tetris(Stage stage)
+	{
+		init();
+		stage.addEventFilter(KeyEvent.KEY_PRESSED,keyboardEvent);
+	}
 
-        byte[][] getBaseTetromino() {
-            switch (this.name()) {
-                case "I":
-                    return new byte[][]{
-                            {1},
-                            {1},
-                            {1},
-                            {1}};
-                case "J":
-                    return new byte[][]{
-                            {0, 2},
-                            {0, 2},
-                            {2, 2}};
-                case "L":
-                    return new byte[][]{
-                            {3, 0},
-                            {3, 0},
-                            {3, 3}};
-                case "O":
-                    return new byte[][]{
-                            {4, 4},
-                            {4, 4}};
-                case "S":
-                    return new byte[][]{
-                            {0, 5, 5},
-                            {5, 5, 0}};
-                case "T":
-                    return new byte[][]{
-                            {0, 6, 0},
-                            {6, 6, 6}};
-                case "Z":
-                    return new byte[][]{
-                            {7, 7, 0},
-                            {0, 7, 7}};
-                default:
-                    return null;
+	private enum Tetromino
+	{
+		I, J, L, O, S, T, Z;
 
-            }
-        }
-    }
+		int rotation = 0;
+		int xPos = 0;
+		int yPos = 0;
+		byte[][] tetromino;
 
-    public void init() {
-        clearStage(stationaryStage);
-        clearStage(fallingStage);
-        currentFalling = Tetromino.Z;
-        currentFalling.tetromino = currentFalling.getBaseTetromino();
-        currentFalling.yPos = 0;
-        currentFalling.xPos = 4;
-        placeFalling();
-        tryFall();
-    }
+		byte[][] getBaseTetromino()
+		{
+			switch (this.name())
+			{
+				case "I":
+					return new byte[][]{
+							{1},
+							{1},
+							{1},
+							{1}};
+				case "J":
+					return new byte[][]{
+							{0, 2},
+							{0, 2},
+							{2, 2}};
+				case "L":
+					return new byte[][]{
+							{3, 0},
+							{3, 0},
+							{3, 3}};
+				case "O":
+					return new byte[][]{
+							{4, 4},
+							{4, 4}};
+				case "S":
+					return new byte[][]{
+							{0, 5, 5},
+							{5, 5, 0}};
+				case "T":
+					return new byte[][]{
+							{0, 6, 0},
+							{6, 6, 6}};
+				case "Z":
+					return new byte[][]{
+							{7, 7, 0},
+							{0, 7, 7}};
+				default:
+					return null;
 
-    private void clearStage(byte[][] stage) {
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 20; y++) {
-                stage[x][y] = 0;
-            }
-        }
-    }
+			}
+		}
+	}
 
-    private class Position {
-        private int xPos = 0, yPos = 0;
+	public void init()
+	{
+		clearStage(stationaryStage);
+		clearStage(fallingStage);
+		currentFalling = Tetromino.Z;
+		currentFalling.tetromino = currentFalling.getBaseTetromino();
+		currentFalling.yPos = 0;
+		currentFalling.xPos = 4;
+		placeFalling();
+		tryFall();
+	}
 
-        Position(int x, int y) {
-            xPos = x;
-            yPos = y;
-        }
+	private void clearStage(byte[][] stage)
+	{
+		for (int x = 0; x < 10; x++)
+		{
+			for (int y = 0; y < 20; y++)
+			{
+				stage[x][y] = 0;
+			}
+		}
+	}
 
-        void setX(int x) {
-            xPos = x;
-        }
+	private void displayStage() {
+		for (int x = 0; x < 20; x++)
+		{
+			for (int y = 0; y < 10; y++)
+			{
+				System.out.print(fallingStage[y][x] + " ");
+			}
+			System.out.println();
+		}
+	}
 
-        void setY(int y) {
-            yPos = y;
-        }
+	private class Position
+	{
+		private int xPos = 0, yPos = 0;
 
-        int getX() {
-            return xPos;
-        }
+		Position(int x, int y)
+		{
+			xPos = x;
+			yPos = y;
+		}
 
-        int getY() {
-            return yPos;
-        }
-    }
+		void setX(int x)
+		{
+			xPos = x;
+		}
 
-    private void tryFall() {
-        for (int x = 0; x < 20; x++) {
-            for (int y = 0; y < 10; y++) {
-                System.out.print(fallingStage[y][x] + " ");
-            }
-            System.out.println();
-        }
+		void setY(int y)
+		{
+			yPos = y;
+		}
 
-        if (canFall()) {
-            clearStage(fallingStage);
-            currentFalling.yPos++;
-            placeFalling();
-            dropTimer.set(freeTime);
-            new Thread(dropOnTimeZero).start();
-        } else {
-            //dropTimer.set(freeTime);
-            //dropOnTimeZero.start();
-        }
-    }
+		int getX()
+		{
+			return xPos;
+		}
 
-    private void placeFalling() {
-        for (int y = 0; y < currentFalling.tetromino.length; y++) {
-            for (int x = 0; x < currentFalling.tetromino[0].length; x++) {
-                fallingStage[currentFalling.xPos + x][currentFalling.yPos + y]
-                        = currentFalling.tetromino[y][x];
-            }
-        }
-    }
+		int getY()
+		{
+			return yPos;
+		}
+	}
 
-    Runnable dropOnTimeZero = new Thread(() -> {
-        while (dropTimer.get() > 0) {
-            //System.out.println(dropTimer.get());
-            try {
-                Thread.sleep(1);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            dropTimer.set(dropTimer.get() - 1);
-        }
+	private void tryFall()
+	{
+		displayStage();
 
-        Platform.runLater(this::tryFall);
-    });
+		if (canFall())
+		{
+			clearStage(fallingStage);
+			currentFalling.yPos++;
+			placeFalling();
+			dropTimer.set(freeTime);
+			new Thread(dropOnTimeZero).start();
+		} else
+		{
+			//dropTimer.set(freeTime);
+			//dropOnTimeZero.start();
+		}
+	}
 
-    private boolean canFall() {
-        Position[] checkUnder = new Position[4];
-        int count = 0;
-        for (int i = 0; i < currentFalling.tetromino.length; i++) {
-            for (int j = 0; j < currentFalling.tetromino[0].length; j++) {
-                if (currentFalling.tetromino[i][j] != 0) {
-                    checkUnder[count++] = new Position(j + currentFalling.xPos,
-                            i + currentFalling.yPos);
-                }
-            }
-        }
+	private void tryMove(int direction) {
+		if(canMove(direction)){
+			clearStage(fallingStage);
+			currentFalling.xPos += direction;
+			placeFalling();
+		}
+		displayStage();
+	}
 
-        for (Position p : checkUnder) {
-            try {
-                if (stationaryStage[p.xPos][p.yPos + 1] != 0) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
-        }
+	private void placeFalling()
+	{
+		for (int y = 0; y < currentFalling.tetromino.length; y++)
+		{
+			for (int x = 0; x < currentFalling.tetromino[0].length; x++)
+			{
+				fallingStage[currentFalling.xPos + x][currentFalling.yPos + y]
+						= currentFalling.tetromino[y][x];
+			}
+		}
+	}
 
-        return true;
-    }
+	Runnable dropOnTimeZero = new Thread(() ->
+	{
+		while (dropTimer.get() > 0)
+		{
+			//System.out.println(dropTimer.get());
+			try
+			{
+				Thread.sleep(1);
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			dropTimer.set(dropTimer.get() - 1);
+		}
 
-    private void fallToStat() {
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 20; y++) {
-                if (fallingStage[x][y] != 0) {
-                    stationaryStage[x][y] = fallingStage[x][y];
-                }
-            }
-        }
-    }
+		Platform.runLater(this::tryFall);
+	});
+
+	private boolean canFall()
+	{
+		Position[] checkUnder = getCheckPositions();
+
+		for (Position p : checkUnder)
+		{
+			try
+			{
+				if (stationaryStage[p.xPos][p.yPos + 1] != 0)
+				{
+					return false;
+				}
+			} catch (Exception e)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean canMove(int direction)
+	{
+		Position[] checkBy = getCheckPositions();
+
+		for (Position p : checkBy)
+		{
+			try
+			{
+				if (stationaryStage[p.xPos + direction][p.yPos] != 0)
+				{
+					return false;
+				}
+			} catch (Exception e)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private Position[] getCheckPositions()
+	{
+		Position[] checkUnder = new Position[4];
+		int count = 0;
+		for (int i = 0; i < currentFalling.tetromino.length; i++)
+		{
+			for (int j = 0; j < currentFalling.tetromino[0].length; j++)
+			{
+				if (currentFalling.tetromino[i][j] != 0)
+				{
+					checkUnder[count++] = new Position(j + currentFalling.xPos,
+							i + currentFalling.yPos);
+				}
+			}
+		}
+		return checkUnder;
+	}
+
+
+	private void fallToStat()
+	{
+		for (int x = 0; x < 10; x++)
+		{
+			for (int y = 0; y < 20; y++)
+			{
+				if (fallingStage[x][y] != 0)
+				{
+					stationaryStage[x][y] = fallingStage[x][y];
+				}
+			}
+		}
+	}
 }
