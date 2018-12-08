@@ -1,22 +1,6 @@
 # Reflection
 
-Add to this file to satisfy the "Reflection Updates" non-functional requirement
-for this project. Please keep this document organized using Markdown. If you
-click on this file in your team's GitHub repository website, then you will see
-that the Markdown is transformed into nice looking HTML. 
-
-Here is a sample entry (delete this line; also: feel free to copy/paste/modify):
-
-## SUN 2017-11-12 @ 11:55 PM EST
-
-1. **DONE:** Downloaded the skeleton code.
-
-2. **TODO:** Finish reading the project description.
-
-3. **PROB:** Had a hard time scheduling physicial meetings with each other at
-   first, but now that we've settled on a regular day/time things are looking
-   great! 
-
+## PROJECT OF: Calvin Childress and Hunter Halloran
 
 ## FRI 2018-11-30 @ 10:48 PM EST
 
@@ -28,3 +12,13 @@ Here is a sample entry (delete this line; also: feel free to copy/paste/modify):
 3. **PROB:** Took a bit of time to set up proper git tools for group version control,
    as well as working on making sure the project would be reasonably structured for
    multiple people's use.
+
+## FRI 2018-12-7 @ 11:39 PM EST
+
+1. **DONE:** Checkers board created, Tetris gravity and horizonal movement finished.
+
+2. **TODO:** Implement Tetris rotation and checkers gamepieces.
+
+3. **PROB:** It has been a bit difficult trying to research how Tetris pieces are
+   supposed to move concerning wallkicks, and the UI of checkers was being a tad
+   finicky.
