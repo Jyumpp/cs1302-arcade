@@ -54,5 +54,9 @@ public class CheckersPiece extends StackPane {
         return oldY;
     } //getOldY
 
+    public void cancel() {
+        relocate(oldX, oldY);
+    } //cancel
+
 } //CheckersPiece
 

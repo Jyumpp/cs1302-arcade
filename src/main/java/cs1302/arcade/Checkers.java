@@ -16,7 +16,10 @@ import javafx.scene.Scene;
 public class Checkers {
 
     Stage stage;
-    private int board[][];
+    //created 8x8 array that will be the gameboard
+    private CheckersSquare[][] board = new CheckersSquare[8][8];
+    private Group squares = new Group();
+    private Group checkers = new Group();
 
     public Checkers(Stage stage) {
         System.out.println("test");
@@ -30,12 +33,20 @@ public class Checkers {
         VBox vbox = new VBox();
         Pane root = new Pane();
         root.setPrefSize(800, 800);
-        Button b = new Button("test");
-        vbox.getChildren().addAll();
+        //Button b = new Button("test");
+        root.getChildren().addAll(squares, checkers);
 
-        Scene s = new Scene(root);
+        for(int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                CheckersSquare square = new CheckersSquare((i+j) % 2 == 0, i, j);
+                board[i][j] = square;
+                squares.getChildren().add(square);
+            }
+        }
+        vbox.getChildren().addAll(root);
+
+        Scene s = new Scene(vbox);
         stage.setScene(s);
-
 
     } //board
 

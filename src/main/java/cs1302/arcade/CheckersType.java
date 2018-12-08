@@ -9,7 +9,6 @@ public enum CheckersType {
     RED(1), BLACK(-1);
     final int direction;
 
-
     CheckersType(int direction) {
         this.direction = direction;
     } //CheckersPiece
