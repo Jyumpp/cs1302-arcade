@@ -17,12 +17,12 @@ public class CheckersPiece extends StackPane {
         move(x, y);
         Circle circle = new Circle(25);
         if (type == CheckersType.RED) {
-            circle.setFill(Color.INDIANRED);
+            circle.setFill(Color.RED.desaturate());
         } else {
-            circle.setFill(Color.BLACK);
+            circle.setFill(Color.BLACK.desaturate());
         } //if
-        circle.setTranslateX(24.0); //places in the center of squares
-        circle.setTranslateX(24.0);
+        circle.setTranslateX(25.0); //places in the center of squares
+        circle.setTranslateY(25.0);
 
         getChildren().add(circle);
         //when the user clicks on desired square, those values get passes to newX/newY
@@ -30,7 +30,7 @@ public class CheckersPiece extends StackPane {
             newX = e.getSceneX();
             newY = e.getSceneY();
         });
-        setOnMouseDragReleased(e -> {
+        setOnMouseDragged(e -> {
             relocate(e.getSceneX() - newX + oldX, e.getSceneY() - newY + oldY);
         });
 

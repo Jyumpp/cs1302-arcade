@@ -21,14 +21,14 @@ public class CheckersSquare extends Rectangle {
      * Default constructor to create the color and size of the squares for the
      * board
      */
-    public CheckersSquare(boolean brown, int x, int y) {
+    public CheckersSquare(boolean dark, int x, int y) {
         setHeight(100.0); //1/8th 0f 800
         setWidth(100.0);
         relocate(x * 100, y * 100);
-        if (brown) { //if boolean is true
-            setFill(Color.BROWN); //set square to brown
+        if (dark) { //if the previous square was light, make the next dark
+            setFill(Color.MAROON.darker()); //set square to brown
         } else {
-            setFill(Color.WHITE); //otherwise set square to white
+            setFill(Color.BEIGE); //otherwise set square to white
         }
     } //CheckersSquare
 
@@ -49,7 +49,7 @@ public class CheckersSquare extends Rectangle {
     /**
      * Sets piece to a square
      */
-    public void setPiece() {
+    public void setPiece(CheckersPiece piece) {
         this.piece = piece;
     } //setPiece
 
