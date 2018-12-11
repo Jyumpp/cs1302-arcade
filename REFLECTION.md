@@ -22,3 +22,18 @@
 3. **PROB:** It has been a bit difficult trying to research how Tetris pieces are
    supposed to move concerning wallkicks, and the UI of checkers was being a tad
    finicky.
+   
+## TUE 2018-12-11 @ 3:08 PM EST
+
+1. **DONE:** Tetris is done! It actually plays well! 
+   The game select was given images and checkers is playable.
+   
+2. **TODO:** Submit!
+
+3. **PROB:** Wow Tetris is a more complicated game than we thought!
+   But we got that working smoothly! It took some fiddling to get a
+   game over animation to work properly for it, and kinged
+   pieces in checkers turned out to be harder than expected.
+   
+4. **MISC:** Also, we turned in our application for the earlier deadline
+   :)

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,6 +27,7 @@ import java.io.FileNotFoundException;
 public class TetrisGame
 {
 	Tetris tetris;
+	Stage stage;
 	HBox hBox;
 	VBox gameTiles, infoTiles;
 	boolean isGameOver = false;
@@ -51,7 +53,18 @@ public class TetrisGame
 	 */
 	TetrisGame(Stage stage)
 	{
+		this.stage = stage;
 		EventHandler<ActionEvent> update = (e) -> render();
+
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle("Tutorial!");
+		alert.setHeaderText("How to Play:");
+		alert.setContentText("Left and Right: Move the piece back and forth!\n" +
+				"Up: Rotate the piece clockwise!\n" +
+				"Down: Speed the piece up!\n" +
+				"Z: Rotate the piece counterclockwise!");
+
+		alert.showAndWait();
 
 		hBox = new HBox();
 		Scene scene = new Scene(hBox);
@@ -62,6 +75,7 @@ public class TetrisGame
 		infoTiles = generateInfo();
 		hBox.getChildren().addAll(gameTiles, infoTiles);
 		stage.show();
+		stage.requestFocus();
 		render();
 		stage.addEventFilter(ActionEvent.ACTION, update);
 	}
@@ -385,6 +399,15 @@ public class TetrisGame
 			if (y >= 210)
 			{
 				stop();
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Game Over :(");
+				alert.setHeaderText("Game Over! Good Job!");
+				alert.setContentText("You Reached Level " + tetris.getLevel() +",\n" +
+						"Cleared " + tetris.getLinesCleared() + " Lines,\n" +
+						"And Scored " + tetris.getScore() + " Points!");
+
+				alert.show();
+				alert.setOnCloseRequest((i)->stage.close());
 			}
 		}
 	}
