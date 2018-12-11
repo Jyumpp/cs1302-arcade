@@ -338,7 +338,7 @@ public class TetrisGame
 	 */
 	private void render()
 	{
-		if (!isGameOver) //only run once after a game over
+		if (!isGameOver && tetris != null) //only run once after a game over
 		{
 			isGameOver = tetris.isGameOver();
 			for (int x = 0; x < 10; x++) //texture of falling or stationary stages
