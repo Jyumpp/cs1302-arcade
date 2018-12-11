@@ -54,6 +54,10 @@ public class TetrisGame
 	TetrisGame(Stage stage)
 	{
 		this.stage = stage;
+		stage.setOnCloseRequest((i)->{
+			tetris = null;
+			stage.close();
+		});
 		EventHandler<ActionEvent> update = (e) -> render();
 
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
