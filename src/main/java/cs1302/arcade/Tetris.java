@@ -12,6 +12,12 @@ import javafx.stage.Stage;
 
 import java.util.Random;
 
+/**
+ * This class produces the backend behavior of the Tetris game
+ *
+ * @author Hunter Halloran
+ * @author Calvin Childress
+ */
 public class Tetris
 {
 	Stage stage;
@@ -27,24 +33,28 @@ public class Tetris
 
 	private LongProperty dropTimer = new SimpleLongProperty(0);
 
+	//X components of the spin tests for all non-I Tetrominos
 	private int[][] clockwiseXSpinTests = {
 			{0, -1, -1, 0, -1},
 			{0, 1, 1, 0, 1},
 			{0, 1, 1, 0, 1},
 			{0, -1, -1, 0, -1}
 	};
+	//Y components of the spin tests for all non-I Tetrominos
 	private int[][] clockwiseYSpinTests = {
 			{0, 0, 1, -2, -2},
 			{0, 0, -1, 2, 2},
 			{0, 0, 1, -2, -2},
 			{0, 0, -1, 2, 2}
 	};
+	//X components of the spin tests for I Tetrominos
 	private int[][] clockwiseIXSpinTests = {
 			{0, -2, 1, -2, 1},
 			{0, -1, 2, -1, 2},
 			{0, 2, -1, 2, -1},
 			{0, 1, -2, 1, -2}
 	};
+	//Y components of the spin tests for I Tetrominos
 	private int[][] clockwiseIYSpinTests = {
 			{0, 0, 0, -1, 2},
 			{0, 0, 0, 2, -1},
@@ -52,11 +62,18 @@ public class Tetris
 			{0, 0, 0, -2, 1}
 	};
 
+	//Same as above, but in the other rotation direction
 	private int[][] counterClockwiseXSpinTests = new int[4][5];
 	private int[][] counterClockwiseYSpinTests = new int[4][5];
 	private int[][] counterClockwiseIXSpinTests = new int[4][5];
 	private int[][] counterClockwiseIYSpinTests = new int[4][5];
 
+	/**
+	 * This constructor initializes a new Tetris game.
+	 *
+	 * @param stage the stage to receive KeyEvents from or
+	 *              to send update events to
+	 */
 	Tetris(Stage stage)
 	{
 		this.stage = stage;
@@ -84,7 +101,7 @@ public class Tetris
 		{
 			if (event.getCode() == KeyCode.DOWN)
 			{
-				dropSpeedUp = true;
+				dropSpeedUp = true; //ignore timings if player requests faster speed
 				freeTime = 50;
 			}
 		};
@@ -93,7 +110,7 @@ public class Tetris
 		{
 			if (event.getCode() == KeyCode.DOWN)
 			{
-				dropSpeedUp = false;
+				dropSpeedUp = false; //resume normal timings
 				freeTime = getDifficultyTime();
 			}
 		};
@@ -103,53 +120,92 @@ public class Tetris
 		stage.addEventFilter(KeyEvent.KEY_RELEASED, speedDown);
 	}
 
+	/**
+	 * Returns the stationaryStage byte array.
+	 *
+	 * @return 2D byte array
+	 */
 	public byte[][] getStationaryStage()
 	{
 		return stationaryStage;
 	}
 
+	/**
+	 * Returns the fallingStage byte array.
+	 *
+	 * @return 2D byte array
+	 */
 	public byte[][] getFallingStage()
 	{
 		return fallingStage;
 	}
 
+	/**
+	 * Returns the number of lines cleared.
+	 *
+	 * @return number of lines cleared
+	 */
 	public int getLinesCleared()
 	{
 		return linesCleared;
 	}
 
+	/**
+	 * Returns the current level number.
+	 *
+	 * @return the current level
+	 */
 	public int getLevel()
 	{
 		return level;
 	}
 
+	/**
+	 * Returns the current score.
+	 *
+	 * @return current score
+	 */
 	public int getScore()
 	{
 		return score;
 	}
 
+	/**
+	 * Returns true if game is finished.
+	 *
+	 * @return game state
+	 */
 	public boolean isGameOver()
 	{
 		return gameOver;
 	}
 
+	/**
+	 * Returns the next Tetromino to fall.
+	 *
+	 * @return Tetromino object
+	 */
 	public Tetromino getNextFall()
 	{
 		return nextFall;
 	}
 
+	/**
+	 * Initializes variable values.
+	 */
 	private void init()
 	{
+		//Spin Tests repeat over clockwise and counterclockwise
 		counterClockwiseXSpinTests[0] = clockwiseXSpinTests[1];
 		counterClockwiseXSpinTests[1] = clockwiseXSpinTests[0];
 		counterClockwiseXSpinTests[2] = clockwiseXSpinTests[3];
 		counterClockwiseXSpinTests[3] = clockwiseXSpinTests[2];
-
 		counterClockwiseYSpinTests[0] = clockwiseYSpinTests[1];
 		counterClockwiseYSpinTests[1] = clockwiseYSpinTests[0];
 		counterClockwiseYSpinTests[2] = clockwiseYSpinTests[3];
 		counterClockwiseYSpinTests[3] = clockwiseYSpinTests[2];
 
+		//I Spin Tests for counterclockwise motion is the negative of clockwise
 		for (int x = 0; x < 4; x++)
 		{
 			for (int y = 0; y < 5; y++)
@@ -167,27 +223,42 @@ public class Tetris
 		setupNextFall();
 	}
 
+	/**
+	 * Prepares the next Tetromino to fall while setting the new current falling.
+	 */
 	private void setupNextFall()
 	{
-		currentFalling = nextFall;
-		nextFall = randomTetromino();
+		currentFalling = nextFall; //replace falling piece
+		nextFall = randomTetromino(); //randomize the next piece
 		nextFall.tetromino = nextFall.getBaseTetromino();
-		currentFalling.yPos = 0;
+		currentFalling.yPos = 0; //set at center top of screen
 		currentFalling.xPos = 4;
-		clearStage(fallingStage);
-		placeFalling();
-		tryFall();
+		clearStage(fallingStage); //clear the falling stage
+		placeFalling(); //place the falling Tetromino on the falling stage
+		tryFall(); //attempt to make the piece fall
 	}
 
+	/**
+	 * Returns a random Tetromino object
+	 *
+	 * @return random Tetromino object
+	 */
 	private Tetromino randomTetromino()
 	{
 		Tetromino retTet = new Tetromino();
 		Random r = new Random();
+
+		//get a random Tetromino of any shape
 		retTet.setPieceType(Tetromino.Tetrominos.values()[r.nextInt(7)]);
 
 		return retTet;
 	}
 
+	/**
+	 * Clears all values of a byte array to 0.
+	 *
+	 * @param stage 2D byte array to clear
+	 */
 	private void clearStage(byte[][] stage)
 	{
 		for (int x = 0; x < 10; x++)
@@ -199,17 +270,24 @@ public class Tetris
 		}
 	}
 
+	/**
+	 * Sends an event to the stage to trigger the GUI to update.
+	 */
 	private void displayStage()
 	{
 		stage.fireEvent(e);
 	}
 
+	/**
+	 * Attempts to cause the current falling piece to fall one unit.
+	 */
 	private void tryFall()
 	{
 		displayStage();
 
 		if (canFall())
 		{
+			//cause the piece to fall if it can
 			clearStage(fallingStage);
 			currentFalling.yPos++;
 			placeFalling();
@@ -217,6 +295,7 @@ public class Tetris
 			new Thread(dropOnTimeZero).start();
 		} else
 		{
+			//try to set the piece if it can't fall
 			dropTimer.set(getDifficultyTime());
 			new Thread(setOnTimeZero).start();
 		}
@@ -224,10 +303,16 @@ public class Tetris
 		displayStage();
 	}
 
+	/**
+	 * Attempts to move the current falling piece one unit in a given direction.
+	 *
+	 * @param direction the direction to move (left or right)
+	 */
 	private void tryMove(int direction)
 	{
 		if (canMove(direction))
 		{
+			//move the piece if it can move
 			clearStage(fallingStage);
 			currentFalling.xPos += direction;
 			placeFalling();
@@ -236,11 +321,17 @@ public class Tetris
 		displayStage();
 	}
 
+	/**
+	 * Attempts to rotate the current falling piece in a given direction.
+	 *
+	 * @param direction the direction to rotate
+	 */
 	private void tryRotate(int direction)
 	{
 		byte[][] tryTurn = currentFalling.rotateTetromino(direction);
 		Position rotPos = currentFalling.getRotLocation(direction);
 
+		//it turns out the official Tetris SRS rotation system is complicated :P
 		int[][] spinXTest = (currentFalling.getPieceType() == Tetromino.Tetrominos.I) ?
 				(direction == RIGHT ? clockwiseIXSpinTests : counterClockwiseIXSpinTests) :
 				(direction == RIGHT ? clockwiseXSpinTests : counterClockwiseXSpinTests);
@@ -255,6 +346,15 @@ public class Tetris
 		displayStage();
 	}
 
+	/**
+	 * Evaluates all spin tests to properly implement the Tetris "SRS" method of rotation.
+	 *
+	 * @param tryTurn   a byte array of the turned Tetromino
+	 * @param rotPos    the position which the top-left of the Tetromino should be
+	 * @param direction the direction to rotate
+	 * @param xPos      the proper X spin test
+	 * @param yPos      the proper Y spin test
+	 */
 	private void evaluateSpinTests(byte[][] tryTurn, Position rotPos,
 								   int direction, int[] xPos, int[] yPos)
 	{
@@ -270,7 +370,7 @@ public class Tetris
 				{
 					if (stationaryStage[c.getX()][c.getY()] == 0)
 					{
-						if (++count == 4)
+						if (++count == 4) //if it gets to 4 it passed all tests
 						{
 							set(tryTurn, at, direction);
 							return;
@@ -278,17 +378,24 @@ public class Tetris
 					} else break;
 				} catch (Exception e)
 				{
-					break;
+					break; //if the array is out of bounds it probably shouldn't turn there
 				}
 			}
 		}
 	}
 
+	/**
+	 * Sets the values of a rotated Tetromino.
+	 *
+	 * @param tryTurn   the byte array of a turned Tetromino
+	 * @param p         the position to put the Tetromino at
+	 * @param direction the direction the Tetromino was rotated
+	 */
 	private void set(byte[][] tryTurn, Position p, int direction)
 	{
 		if (direction == RIGHT)
 		{
-			currentFalling.intRotation();
+			currentFalling.incRotation();
 		} else if (direction == LEFT)
 		{
 			currentFalling.decRotation();
@@ -298,6 +405,9 @@ public class Tetris
 		currentFalling.yPos = p.getY();
 	}
 
+	/**
+	 * Places a the current falling tetromino onto the falling stage.
+	 */
 	private void placeFalling()
 	{
 		for (int y = 0; y < currentFalling.tetromino.length; y++)
@@ -307,22 +417,27 @@ public class Tetris
 				if (stationaryStage[currentFalling.xPos + x][currentFalling.yPos + y] != 0 &&
 						currentFalling.tetromino[y][x] != 0)
 				{
+					//if initial space is occupied, game over!
 					gameOver = true;
 					displayStage();
 					return;
 				}
+				//place 2D array at a given offset to the full stage
 				fallingStage[currentFalling.xPos + x][currentFalling.yPos + y]
 						= currentFalling.tetromino[y][x];
 			}
 		}
 	}
 
+	/**
+	 * New Thread to drop the Tetromino one unit per amount of time.
+	 */
 	private Runnable dropOnTimeZero = new Thread(() ->
 	{
 		long timer = dropTimer.get();
 		while (timer > 0)
 		{
-			if (dropSpeedUp)
+			if (dropSpeedUp) //ignore timings if player wants to go faster
 			{
 				timer = freeTime;
 				dropSpeedUp = false;
@@ -336,10 +451,13 @@ public class Tetris
 			}
 			dropTimer.set(--timer);
 		}
-
+		//fall again after the time has run out
 		Platform.runLater(this::tryFall);
 	});
 
+	/**
+	 * New Thread to set the Tetromino in place in an amount of time.
+	 */
 	private Runnable setOnTimeZero = new Thread(() ->
 	{
 		dropTimer.set(getDifficultyTime());
@@ -354,7 +472,7 @@ public class Tetris
 			}
 			dropTimer.set(dropTimer.get() - 1);
 		}
-		if (!canFall())
+		if (!canFall()) //sometimes if a piece is moved it could fall after it couldn't
 		{
 			freeTime = getDifficultyTime();
 			fallToStat();
@@ -365,10 +483,15 @@ public class Tetris
 			});
 		} else
 		{
-			new Thread(dropOnTimeZero).start();
+			new Thread(dropOnTimeZero).start(); //try to fall again if it can
 		}
 	});
 
+	/**
+	 * Checks whether the current falling Tetromino can fall more.
+	 *
+	 * @return true if can still fall
+	 */
 	private boolean canFall()
 	{
 		Position[] checkUnder = getCheckPositions();
@@ -390,6 +513,12 @@ public class Tetris
 		return true;
 	}
 
+	/**
+	 * Checks whether the current falling Tetromino can move in a direction.
+	 *
+	 * @param direction the direction of movement
+	 * @return true if can move
+	 */
 	private boolean canMove(int direction)
 	{
 		Position[] checkBy = getCheckPositions();
@@ -411,6 +540,11 @@ public class Tetris
 		return true;
 	}
 
+	/**
+	 * Returns the positions to check movement with.
+	 *
+	 * @return array of positions
+	 */
 	private Position[] getCheckPositions()
 	{
 		Position[] checkUnder = new Position[4];
@@ -429,6 +563,13 @@ public class Tetris
 		return checkUnder;
 	}
 
+	/**
+	 * Returns positions to check movement with for a given byte array and initial position.
+	 *
+	 * @param tetromino the 2D byte array of the Tetromino
+	 * @param p         the position of the top-right of the Tetromino byte array
+	 * @return array of positions
+	 */
 	private Position[] getCheckPositions(byte[][] tetromino, Position p)
 	{
 		Position[] checkUnder = new Position[4];
@@ -447,7 +588,9 @@ public class Tetris
 		return checkUnder;
 	}
 
-
+	/**
+	 * Sets the current falling stage into the stationary stage.
+	 */
 	private void fallToStat()
 	{
 		for (int x = 0; x < 10; x++)
@@ -464,6 +607,9 @@ public class Tetris
 		checkClear();
 	}
 
+	/**
+	 * Checks to see if any lines should be cleared and calls to update scores.
+	 */
 	private void checkClear()
 	{
 		int linesCleared = 0, lineOn = 20;
@@ -476,13 +622,13 @@ public class Tetris
 			{
 				if (stationaryStage[x][y] != 0)
 				{
-					if (++count == 10)
+					if (++count == 10) //full line let be deleted
 					{
 						linesCleared++;
 					}
 				} else
 				{
-					for (int i = 0; i < 10; i++)
+					for (int i = 0; i < 10; i++) //save lines that aren't complete
 					{
 						newStat[i][lineOn] = stationaryStage[i][y];
 					}
@@ -495,11 +641,16 @@ public class Tetris
 		updateScore(linesCleared);
 	}
 
+	/**
+	 * Updates the score based on number of lines cleared.
+	 *
+	 * @param linesCleared number of lines cleared.
+	 */
 	private void updateScore(int linesCleared)
 	{
 		this.linesCleared += linesCleared;
 		int n = level + 1;
-		switch (linesCleared)
+		switch (linesCleared) //more lines cleared at once, more points!
 		{
 			case 4:
 				score += n * 1200;
@@ -513,8 +664,14 @@ public class Tetris
 		level = this.linesCleared / 10;
 	}
 
+	/**
+	 * Returns the amount of time per drop at a given level.
+	 *
+	 * @return amount of milliseconds per drop
+	 */
 	private long getDifficultyTime()
 	{
+		//reduce drop time by 3/4 every level
 		long t = 1000;
 		for (int i = 0; i < level; i++)
 		{

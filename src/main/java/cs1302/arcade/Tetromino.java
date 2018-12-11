@@ -1,9 +1,19 @@
 package cs1302.arcade;
 
+/**
+ * This class provides the framework for different types of Tetrominos.
+ *
+ * @author Hunter Halloran
+ * @author Calvin Childress
+ */
 public class Tetromino
 {
-	enum Tetrominos {
-		I,J,L,O,S,T,Z
+	/**
+	 * The different types of Tetrominos for the game.
+	 */
+	enum Tetrominos
+	{
+		I, J, L, O, S, T, Z
 	}
 
 	private Tetrominos pieceType;
@@ -12,34 +22,67 @@ public class Tetromino
 	int yPos = 0;
 	byte[][] tetromino;
 
-	void setPieceType(Tetrominos t) {
+	/**
+	 * Sets the piece type to a given Tetromino.
+	 *
+	 * @param t the type to set to
+	 */
+	void setPieceType(Tetrominos t)
+	{
 		pieceType = t;
 	}
 
-	Tetrominos getPieceType() {
+	/**
+	 * Returns the Tetromino type.
+	 *
+	 * @return Tetromino type.
+	 */
+	Tetrominos getPieceType()
+	{
 		return pieceType;
 	}
 
-	void intRotation() {
+	/**
+	 * Increments the rotation value by one.
+	 */
+	void incRotation()
+	{
 		rotation = (rotation + 1) % 4;
 	}
 
-	void decRotation() {
+	/**
+	 * Decrements the rotation value by one.
+	 */
+	void decRotation()
+	{
 		rotation = (rotation + 3) % 4;
 	}
 
-	int getRotation() {
+	/**
+	 * Returns the current rotation value.
+	 *
+	 * @return current rotation
+	 */
+	int getRotation()
+	{
 		return rotation;
 	}
 
+	/**
+	 * Returns a 2D byte array of the Tetromino rotated in a given direction.
+	 *
+	 * @param direction the direction of rotation
+	 * @return rotated Tetromino byte array
+	 */
 	byte[][] rotateTetromino(int direction)
 	{
 		byte[][] returnByte = new byte[tetromino[0].length][];
 		for (int b = 0; b < returnByte.length; b++)
 		{
+			//creates byte array of opposite dimensions
 			returnByte[b] = new byte[tetromino.length];
 		}
-		if (direction == Tetris.RIGHT)
+		if (direction == Tetris.RIGHT) //rotates the Tetromino clockwise
 		{
 			for (int y = 0; y < tetromino.length; y++)
 			{
@@ -48,7 +91,7 @@ public class Tetromino
 					returnByte[x][tetromino.length - y - 1] = tetromino[y][x];
 				}
 			}
-		} else
+		} else if (direction == Tetris.LEFT) //rotates the Tetromino counterclockwise
 		{
 			for (int y = 0; y < tetromino.length; y++)
 			{
@@ -61,12 +104,18 @@ public class Tetromino
 		return returnByte;
 	}
 
+	//Offsets to rotate Tetrominos around their center of rotation
 	final int[] IXOffsets = {2, -2, 1, -1};
 	final int[] IYOffsets = {-1, 2, -2, 1};
-
 	final int[] JLSTZXOffsets = {1, -1, 0, 0};
 	final int[] JLSTZYOffsets = {0, 1, -1, 0};
 
+	/**
+	 * Returns the position offset for a given piece and direction.
+	 *
+	 * @param direction the direction of rotation
+	 * @return the relative position of the offset piece
+	 */
 	Position getOffset(int direction)
 	{
 		switch (this.pieceType)
@@ -80,18 +129,32 @@ public class Tetromino
 		}
 	}
 
+	/**
+	 * Returns the position offsets for a given piece and direction for specified offsets.
+	 *
+	 * @param direction the direction of rotation
+	 * @param x         the specified x offset list
+	 * @param y         the specified y offset list
+	 * @return the relative position of the offset piece
+	 */
 	Position getOffset(int direction, int[] x, int[] y)
 	{
 		if (direction == Tetris.RIGHT)
 		{
-			return new Position(x[rotation], y[rotation]);
+			return new Position(x[rotation], y[rotation]); //returns the normal offset
 		} else
 		{
-			int rot = (rotation + 15) % 4;
-			return new Position(-x[rot], -y[rot]);
+			int rot = (rotation + 15) % 4; //ensures proper wrap, always within [0,3]
+			return new Position(-x[rot], -y[rot]); //uses the negative of the offset
 		}
 	}
 
+	/**
+	 * Returns the absolute location of the rotated piece.
+	 *
+	 * @param direction the direction of rotation
+	 * @return the absolute location of the offset piece
+	 */
 	Position getRotLocation(int direction)
 	{
 		Position retPos = getOffset(direction);
@@ -100,6 +163,11 @@ public class Tetromino
 		return retPos;
 	}
 
+	/**
+	 * Returns the base Tetromino shape.
+	 *
+	 * @return base Tetromino 2D byte array
+	 */
 	byte[][] getBaseTetromino()
 	{
 		switch (this.pieceType)

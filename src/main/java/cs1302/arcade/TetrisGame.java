@@ -16,6 +16,13 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+/**
+ * This class produces the majority of the GUI elements for the
+ * Tetris game.
+ *
+ * @author Hunter Halloran
+ * @author Calvin Childress
+ */
 public class TetrisGame
 {
 	Tetris tetris;
@@ -36,6 +43,12 @@ public class TetrisGame
 			getImageFromFile("textures/gameover.png")
 	};
 
+	/**
+	 * This constructor creates the main panel for the game.
+	 *
+	 * @param stage the stage passed from the main arcade app
+	 *              to put the game into
+	 */
 	TetrisGame(Stage stage)
 	{
 		EventHandler<ActionEvent> update = (e) -> render();
@@ -53,6 +66,12 @@ public class TetrisGame
 		stage.addEventFilter(ActionEvent.ACTION, update);
 	}
 
+	/**
+	 * Returns an Image object from a given file name.
+	 *
+	 * @param fileName file to get the image from
+	 * @return new Image object
+	 */
 	Image getImageFromFile(String fileName)
 	{
 		Image returnImage;
@@ -68,6 +87,11 @@ public class TetrisGame
 		return returnImage;
 	}
 
+	/**
+	 * Generates the right-hand information portion of the display.
+	 *
+	 * @return populated VBox of information
+	 */
 	VBox generateInfo()
 	{
 		VBox vBox = new VBox();
@@ -83,11 +107,26 @@ public class TetrisGame
 		return vBox;
 	}
 
+	/**
+	 * Generates a formatted HBox with borders and text,
+	 * with predefined font settings.
+	 *
+	 * @param text the text to be put into a label
+	 * @return populated HBox
+	 */
 	private HBox generateLabel(String text)
 	{
 		return generateLabel(text, "Courier", 25);
 	}
 
+	/**
+	 * Generates a formatted HBox with borders and text.
+	 *
+	 * @param text     the text to be put into a label
+	 * @param font     the font family to use
+	 * @param fontSize the font size to use
+	 * @return populated HBox
+	 */
 	private HBox generateLabel(String text, String font, int fontSize)
 	{
 		Label nextLabel = new Label(text);
@@ -103,6 +142,12 @@ public class TetrisGame
 		return h;
 	}
 
+	/**
+	 * Generates a formatted VBox with all score based elements
+	 * of the program.
+	 *
+	 * @return populated VBox
+	 */
 	private VBox generateLevelAndScore()
 	{
 		VBox vBox = new VBox();
@@ -120,6 +165,13 @@ public class TetrisGame
 		return vBox;
 	}
 
+	/**
+	 * Generates a display of a given Tetromino with a width
+	 * of ten units.
+	 *
+	 * @param t the Tetromino to use
+	 * @return populated HBox
+	 */
 	HBox displayPieceFullWidth(Tetromino t)
 	{
 		HBox h = new HBox();
@@ -130,6 +182,12 @@ public class TetrisGame
 		return h;
 	}
 
+	/**
+	 * Generates a display of a given Tetromino.
+	 *
+	 * @param t the Tetromino to use
+	 * @return populated VBox
+	 */
 	VBox displayPiece(Tetromino t)
 	{
 		VBox retBox = new VBox();
@@ -147,6 +205,13 @@ public class TetrisGame
 		return buildShapes(t, retBox);
 	}
 
+	/**
+	 * Builds the actual shape of a given Tetromino.
+	 *
+	 * @param t      the Tetromino to use
+	 * @param retBox the VBox to apply the shape to
+	 * @return populated VBox
+	 */
 	private VBox buildShapes(Tetromino t, VBox retBox)
 	{
 		int offset = t.getPieceType().name().equals("O") ? 2 : 1;
@@ -161,6 +226,14 @@ public class TetrisGame
 		return retBox;
 	}
 
+	/**
+	 * Generates a border of a given height and width with
+	 * texture #8.
+	 *
+	 * @param h the height
+	 * @param w the width
+	 * @return populated VBox as a border
+	 */
 	VBox generateInfoBorder(int h, int w)
 	{
 		VBox retBox = new VBox();
@@ -171,6 +244,12 @@ public class TetrisGame
 		return retBox;
 	}
 
+	/**
+	 * Generates a row of given width with texture #8.
+	 *
+	 * @param w the width
+	 * @return populated HBox of textures
+	 */
 	HBox generateInfoRow(int w)
 	{
 		HBox retBox = new HBox();
@@ -181,11 +260,23 @@ public class TetrisGame
 		return retBox;
 	}
 
+	/**
+	 * Generates a row of 10 units with texture #0.
+	 *
+	 * @return populated HBox of textures
+	 */
 	HBox generatePlayFieldRow()
 	{
 		return generateFullRow(textures[0]);
 	}
 
+	/**
+	 * Generates a row of a given width and given texture.
+	 *
+	 * @param i the texture to use
+	 * @param w the width
+	 * @return populated HBox of textures
+	 */
 	HBox generateRow(Image i, int w)
 	{
 		HBox retBox = new HBox();
@@ -197,11 +288,22 @@ public class TetrisGame
 		return retBox;
 	}
 
+	/**
+	 * Generates a row of 10 units for a given texture.
+	 *
+	 * @param i the texture to use
+	 * @return populated HBox of textures
+	 */
 	HBox generateFullRow(Image i)
 	{
 		return generateRow(i, 10);
 	}
 
+	/**
+	 * Generates an array of HBoxes for each row and column of the play area.
+	 *
+	 * @return an HBox array of texture #0.
+	 */
 	HBox[] setupPlayField()
 	{
 		HBox[] retBoxes = new HBox[20];
@@ -212,29 +314,31 @@ public class TetrisGame
 		return retBoxes;
 	}
 
+	/**
+	 * Updates the play area and information area with proper details
+	 * from the Tetris object.
+	 */
 	private void render()
 	{
-		if (!isGameOver)
+		if (!isGameOver) //only run once after a game over
 		{
 			isGameOver = tetris.isGameOver();
-			for (int x = 0; x < 10; x++)
+			for (int x = 0; x < 10; x++) //texture of falling or stationary stages
 			{
 				for (int y = 1; y < 21; y++)
 				{
 					((ImageView) ((HBox) gameTiles.getChildren().get(y - 1)).getChildren().get(x))
 							.setImage(textures[tetris.getFallingStage()[x][y] |
-									tetris.getStationaryStage()[x][y]]
-							);
+									tetris.getStationaryStage()[x][y]]);
 				}
 			}
-
-			((HBox) infoTiles.getChildren().get(4)).getChildren()
+			((HBox) infoTiles.getChildren().get(4)).getChildren() //set next piece display
 					.set(1, displayPiece(tetris.getNextFall()));
-			setScoreText(0, tetris.getScore());
+			setScoreText(0, tetris.getScore()); //update score boxes
 			setScoreText(1, tetris.getLevel());
 			setScoreText(2, tetris.getLinesCleared());
 
-			if (isGameOver)
+			if (isGameOver) //makes sure this only runs once
 			{
 				AnimationTimer animationTimer = new GameOver();
 				animationTimer.start();
@@ -242,10 +346,15 @@ public class TetrisGame
 		}
 	}
 
+	/**
+	 * Method indicating behavior upon Game Over animation.
+	 *
+	 * @param y the height of the animation
+	 */
 	private void gameOver(int y)
 	{
 
-		for (int x = 0; x < 10; x++)
+		for (int x = 0; x < 10; x++) //set all non #0 textures to texture #9
 		{
 			if ((tetris.getFallingStage()[x][y] | tetris.getStationaryStage()[x][y]) != 0)
 				((ImageView) ((HBox) gameTiles.getChildren().get(y - 1)).getChildren().get(x))
@@ -254,6 +363,9 @@ public class TetrisGame
 
 	}
 
+	/**
+	 * Describes the behavior upon Game Over.
+	 */
 	private class GameOver extends AnimationTimer
 	{
 		int y = 10;
@@ -277,8 +389,15 @@ public class TetrisGame
 		}
 	}
 
+	/**
+	 * Sets scores in the proper display box.
+	 *
+	 * @param box   which box to update
+	 * @param score what to update the box with
+	 */
 	private void setScoreText(int box, int score)
 	{
+		//It's messy but it's just a lot of boxes inside other boxes :/
 		((Label) ((HBox) ((VBox) infoTiles.getChildren().get(6)).getChildren().get(box * 3 + 1))
 				.getChildren().get(1)).setText(String.valueOf(score));
 	}
