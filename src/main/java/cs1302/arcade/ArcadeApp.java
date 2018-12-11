@@ -56,16 +56,12 @@ public class ArcadeApp extends Application {
         vbox.getChildren().addAll(tetris, checkers);
 
         tetris.setOnAction(e -> {
-            VBox v = new VBox();
             Stage stage = new Stage();
-            Scene scene = new Scene(v);
             stage.setResizable(false);
             stage.setTitle("TETRIS!");
-            stage.setScene(scene);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
 
-            Tetris t = new Tetris(stage);
+            TetrisGame t = new TetrisGame(stage);
 
         });
         checkers.setOnAction(e -> {

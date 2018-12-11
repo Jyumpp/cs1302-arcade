@@ -3,82 +3,63 @@ package cs1302.arcade;
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.util.Random;
 
-
 public class Tetris
 {
-	private class Position
-	{
-		private float xPos = 0, yPos = 0;
-
-		Position(float x, float y)
-		{
-			xPos = x;
-			yPos = y;
-		}
-
-		void setX(float x)
-		{
-			xPos = x;
-		}
-
-		void setY(float y)
-		{
-			yPos = y;
-		}
-
-		float getX()
-		{
-			return xPos;
-		}
-
-		float getY()
-		{
-			return yPos;
-		}
-	}
-
+	Stage stage;
 	private byte[][] stationaryStage = new byte[10][20];
 	private byte[][] fallingStage = new byte[10][20];
-	private Tetromino currentFalling;
-	private long freeTime = 1000;
-	private static final int LEFT = -1, RIGHT = 1;
+	private Tetromino currentFalling, nextFall;
+	private long freeTime = 1000, difficultyTime = 1000;
+	static final int LEFT = -1, RIGHT = 1;
+
+	Event e = new ActionEvent();
 
 	private LongProperty dropTimer = new SimpleLongProperty(0);
 
-	private Position[][] clockwiseSpinTests = {
-			{new Position(0, 0),
-					new Position(-1, 0),
-					new Position(-1, 1),
-					new Position(0, -2),
-					new Position(-1, -2)},
-			{new Position(0, 0),
-					new Position(1, 0),
-					new Position(1, -1),
-					new Position(0, 2),
-					new Position(1, 2)},
-			{new Position(0, 0),
-					new Position(1, 0),
-					new Position(1, 1),
-					new Position(0, -2),
-					new Position(1, -2)},
-			{new Position(0, 0),
-					new Position(-1, 0),
-					new Position(-1, -1),
-					new Position(0, 2),
-					new Position(-1, 2)}};
-	private Position[][] counterClockwiseSpinTests = new Position[4][5];
+	private int[][] clockwiseXSpinTests = {
+			{0, -1, -1, 0, -1},
+			{0, 1, 1, 0, 1},
+			{0, 1, 1, 0, 1},
+			{0, -1, -1, 0, -1}
+	};
+	private int[][] clockwiseYSpinTests = {
+			{0, 0, 1, -2, -2},
+			{0, 0, -1, 2, 2},
+			{0, 0, 1, -2, -2},
+			{0, 0, -1, 2, 2}
+	};
+	private int[][] clockwiseIXSpinTests = {
+			{0, -2, 1, -2, 1},
+			{0, -1, 2, -1, 2},
+			{0, 2, -1, 2, -1},
+			{0, 1, -2, 1, -2}
+	};
+	private int[][] clockwiseIYSpinTests = {
+			{0, 0, 0, -1, 2},
+			{0, 0, 0, 2, -1},
+			{0, 0, 0, 1, -2},
+			{0, 0, 0, -2, 1}
+	};
 
+	private int[][] counterClockwiseXSpinTests = new int[4][5];
+	private int[][] counterClockwiseYSpinTests = new int[4][5];
+	private int[][] counterClockwiseIXSpinTests = new int[4][5];
+	private int[][] counterClockwiseIYSpinTests = new int[4][5];
 
-	EventHandler<KeyEvent> keyboardEvent = new EventHandler<KeyEvent>()
+	Tetris(Stage stage)
 	{
-		@Override
-		public void handle(KeyEvent event)
+		this.stage = stage;
+		init();
+		EventHandler<KeyEvent> keyboardEvent = event ->
 		{
 			switch (event.getCode())
 			{
@@ -88,124 +69,94 @@ public class Tetris
 				case RIGHT:
 					tryMove(RIGHT);
 					break;
-				default:
+				case UP:
+					tryRotate(RIGHT);
+					break;
+				case Z:
+					tryRotate(LEFT);
 					break;
 			}
-		}
-	};
+		};
 
-	Tetris(Stage stage)
-	{
-		init();
+		EventHandler<KeyEvent> speedUp = event ->
+		{
+			if (event.getCode() == KeyCode.DOWN)
+			{
+				freeTime = 50;
+			}
+		};
+
+		EventHandler<KeyEvent> speedDown = event ->
+		{
+			if (event.getCode() == KeyCode.DOWN)
+			{
+				freeTime = difficultyTime;
+			}
+		};
+
 		stage.addEventFilter(KeyEvent.KEY_PRESSED, keyboardEvent);
+		stage.addEventFilter(KeyEvent.KEY_PRESSED, speedUp);
+		stage.addEventFilter(KeyEvent.KEY_RELEASED, speedDown);
 	}
 
-	private enum Tetromino
+	public byte[][] getStationaryStage()
 	{
-		I, J, L, O, S, T, Z;
-
-		int rotation = 0;
-		int xPos = 0;
-		int yPos = 0;
-		float rotOffset;
-		byte[][] tetromino;
-
-		byte[][] rotateTetromino(int direction)
-		{
-			byte[][] returnByte = new byte[tetromino[0].length][];
-			for (int b = 0; b < returnByte.length; b++)
-			{
-				returnByte[b] = new byte[tetromino.length];
-			}
-			if (direction == Tetris.LEFT)
-			{
-				for (int y = 0; y < tetromino.length; y++)
-				{
-					for (int x = 0; x < tetromino[0].length; x++)
-					{
-						returnByte[x][y] = tetromino[y][x];
-					}
-				}
-			} else
-			{
-				for (int y = 0; y < tetromino.length; y++)
-				{
-					for (int x = tetromino[0].length; x > 0; x--)
-					{
-						returnByte[returnByte.length - x][y] = tetromino[y][x - 1];
-					}
-				}
-			}
-			return returnByte;
-		}
-
-		byte[][] getBaseTetromino()
-		{
-			switch (this.name())
-			{
-				case "I":
-					rotOffset = 0.5f;
-					return new byte[][]{
-							{1, 1, 1, 1}};
-				case "J":
-					rotOffset = 1f;
-					return new byte[][]{
-							{2, 0, 0},
-							{2, 2, 2}};
-				case "L":
-					rotOffset = 1f;
-					return new byte[][]{
-							{0, 0, 3},
-							{3, 3, 3}};
-				case "O":
-					rotOffset = 0;
-					return new byte[][]{
-							{4, 4},
-							{4, 4}};
-				case "S":
-					rotOffset = 1f;
-					return new byte[][]{
-							{0, 5, 5},
-							{5, 5, 0}};
-				case "T":
-					rotOffset = 1f;
-					return new byte[][]{
-							{0, 6, 0},
-							{6, 6, 6}};
-				case "Z":
-					rotOffset = 1f;
-					return new byte[][]{
-							{7, 7, 0},
-							{0, 7, 7}};
-				default:
-					return null;
-
-			}
-		}
+		return stationaryStage;
 	}
 
-	public void init()
+	public byte[][] getFallingStage()
 	{
-		counterClockwiseSpinTests[0] = clockwiseSpinTests[1];
-		counterClockwiseSpinTests[1] = clockwiseSpinTests[0];
-		counterClockwiseSpinTests[2] = clockwiseSpinTests[3];
-		counterClockwiseSpinTests[3] = clockwiseSpinTests[2];
+		return fallingStage;
+	}
 
+	private void init()
+	{
+		counterClockwiseXSpinTests[0] = clockwiseXSpinTests[1];
+		counterClockwiseXSpinTests[1] = clockwiseXSpinTests[0];
+		counterClockwiseXSpinTests[2] = clockwiseXSpinTests[3];
+		counterClockwiseXSpinTests[3] = clockwiseXSpinTests[2];
+
+		counterClockwiseYSpinTests[0] = clockwiseYSpinTests[1];
+		counterClockwiseYSpinTests[1] = clockwiseYSpinTests[0];
+		counterClockwiseYSpinTests[2] = clockwiseYSpinTests[3];
+		counterClockwiseYSpinTests[3] = clockwiseYSpinTests[2];
+
+		for (int x = 0; x < 4; x++)
+		{
+			for (int y = 0; y < 5; y++)
+			{
+				counterClockwiseIXSpinTests[x][y] = -clockwiseIXSpinTests[x][y];
+				counterClockwiseIYSpinTests[x][y] = -clockwiseIYSpinTests[x][y];
+			}
+		}
+		currentFalling = new Tetromino();
+		nextFall = new Tetromino();
 		clearStage(stationaryStage);
 		clearStage(fallingStage);
-		currentFalling = randomTetromino();
-		currentFalling.tetromino = currentFalling.getBaseTetromino();
-		currentFalling.tetromino = currentFalling.rotateTetromino(LEFT);
+		nextFall = randomTetromino();
+		nextFall.tetromino = nextFall.getBaseTetromino();
+		setupNextFall();
+	}
+
+	private void setupNextFall()
+	{
+		currentFalling = nextFall;
+		nextFall = randomTetromino();
+		nextFall.tetromino = nextFall.getBaseTetromino();
 		currentFalling.yPos = 0;
 		currentFalling.xPos = 4;
+		clearStage(fallingStage);
 		placeFalling();
 		tryFall();
 	}
 
 	private Tetromino randomTetromino()
 	{
+		Tetromino retTet = new Tetromino();
 		Random r = new Random();
-		return Tetromino.values()[r.nextInt(7)];
+		retTet.setPieceType(Tetromino.Tetrominos.values()[r.nextInt(7)]);
+
+		return retTet;
 	}
 
 	private void clearStage(byte[][] stage)
@@ -221,32 +172,27 @@ public class Tetris
 
 	private void displayStage()
 	{
-		for (int x = 0; x < 20; x++)
-		{
-			for (int y = 0; y < 10; y++)
-			{
-				System.out.print(fallingStage[y][x] + " ");
-			}
-			System.out.println();
-		}
+		stage.fireEvent(e);
 	}
 
 	private void tryFall()
 	{
 		displayStage();
 
-		dropTimer.set(freeTime);
-
 		if (canFall())
 		{
 			clearStage(fallingStage);
 			currentFalling.yPos++;
 			placeFalling();
+			dropTimer.set(freeTime);
 			new Thread(dropOnTimeZero).start();
 		} else
 		{
+			dropTimer.set(difficultyTime);
 			new Thread(setOnTimeZero).start();
 		}
+
+		displayStage();
 	}
 
 	private void tryMove(int direction)
@@ -264,22 +210,61 @@ public class Tetris
 	private void tryRotate(int direction)
 	{
 		byte[][] tryTurn = currentFalling.rotateTetromino(direction);
+		Position rotPos = currentFalling.getRotLocation(direction);
 
-		Position oldCenterLocation = new Position(
-				currentFalling.xPos + currentFalling.tetromino[0].length / 2f,
-				currentFalling.yPos + currentFalling.tetromino.length / 2f);
+		int[][] spinXTest = (currentFalling.getPieceType() == Tetromino.Tetrominos.I) ?
+				(direction == RIGHT ? clockwiseIXSpinTests : counterClockwiseIXSpinTests) :
+				(direction == RIGHT ? clockwiseXSpinTests : counterClockwiseXSpinTests);
+		int[][] spinYTest = (currentFalling.getPieceType() == Tetromino.Tetrominos.I) ?
+				(direction == RIGHT ? clockwiseIYSpinTests : counterClockwiseIYSpinTests) :
+				(direction == RIGHT ? clockwiseYSpinTests : counterClockwiseYSpinTests);
 
-		for (int y = 0; y < tryTurn.length; y++)
+		evaluateSpinTests(tryTurn, rotPos, direction,
+				spinXTest[currentFalling.getRotation()], spinYTest[currentFalling.getRotation()]);
+		clearStage(fallingStage);
+		placeFalling();
+		displayStage();
+	}
+
+	private void evaluateSpinTests(byte[][] tryTurn, Position rotPos,
+								   int direction, int[] xPos, int[] yPos)
+	{
+		for (int i = 0; i < xPos.length; i++)
 		{
-			for (int x = 0; x < tryTurn[0].length; x++)
+			Position at = new Position(rotPos.getX() + xPos[i],
+					rotPos.getY() + yPos[i]);
+			Position[] checkAt = getCheckPositions(tryTurn, at);
+			int count = 0;
+			for (Position c : checkAt)
 			{
-
-
-				/*fallingStage[currentFalling.xPos + x][currentFalling.yPos + y]
-						= currentFalling.tetromino[y][x];*/
+				try
+				{
+					if (stationaryStage[c.getX()][c.getY()] == 0)
+					{
+						if (++count == 4)
+						{
+							set(tryTurn, at, direction);
+							return;
+						}
+					} else break;
+				} catch (Exception e)
+				{
+					break;
+				}
 			}
 		}
+	}
 
+	private void set(byte[][] tryTurn, Position p, int direction)
+	{
+		if(direction == RIGHT) {
+			currentFalling.intRotation();
+		} else if (direction == LEFT){
+			currentFalling.decRotation();
+		}
+		currentFalling.tetromino = tryTurn;
+		currentFalling.xPos = p.getX();
+		currentFalling.yPos = p.getY();
 	}
 
 	private void placeFalling()
@@ -294,12 +279,11 @@ public class Tetris
 		}
 	}
 
-	Runnable dropOnTimeZero = new Thread(() ->
+	private Runnable dropOnTimeZero = new Thread(() ->
 	{
 		long timer = dropTimer.get();
 		while (timer > 0)
 		{
-			//System.out.println(dropTimer.get());
 			try
 			{
 				Thread.sleep(1);
@@ -313,11 +297,10 @@ public class Tetris
 		Platform.runLater(this::tryFall);
 	});
 
-	Runnable setOnTimeZero = new Thread(() ->
+	private Runnable setOnTimeZero = new Thread(() ->
 	{
 		while (dropTimer.get() > 0)
 		{
-			//System.out.println(dropTimer.get());
 			try
 			{
 				Thread.sleep(1);
@@ -327,9 +310,16 @@ public class Tetris
 			}
 			dropTimer.set(dropTimer.get() - 1);
 		}
-
-		Platform.runLater(this::fallToStat);
-		System.out.println("Set!");
+		if (!canFall())
+		{
+			freeTime = difficultyTime;
+			fallToStat();
+			displayStage();
+			setupNextFall();
+		} else
+		{
+			new Thread(dropOnTimeZero).start();
+		}
 	});
 
 	private boolean canFall()
@@ -340,7 +330,7 @@ public class Tetris
 		{
 			try
 			{
-				if (stationaryStage[(int) p.xPos][(int) p.yPos + 1] != 0)
+				if (stationaryStage[p.getX()][p.getY() + 1] != 0)
 				{
 					return false;
 				}
@@ -361,7 +351,7 @@ public class Tetris
 		{
 			try
 			{
-				if (stationaryStage[(int) p.getX() + direction][(int) p.getY()] != 0)
+				if (stationaryStage[p.getX() + direction][p.getY()] != 0)
 				{
 					return false;
 				}
@@ -424,5 +414,36 @@ public class Tetris
 			}
 		}
 		clearStage(fallingStage);
+		checkClear();
+	}
+
+	private void checkClear()
+	{
+		int linesCleared = 0, lineOn = 19;
+		byte[][] newStat = new byte[10][20];
+		clearStage(newStat);
+		for (int y = 19; y >= 0; y--)
+		{
+			int count = 0;
+			for (int x = 0; x < 10; x++)
+			{
+				if (stationaryStage[x][y] != 0)
+				{
+					if (++count == 10)
+					{
+						linesCleared++;
+					}
+				} else
+				{
+					for (int i = 0; i < 10; i++)
+					{
+						newStat[i][lineOn] = stationaryStage[i][y];
+					}
+					lineOn--;
+					break;
+				}
+			}
+		}
+		stationaryStage = newStat;
 	}
 }
