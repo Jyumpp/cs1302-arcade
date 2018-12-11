@@ -15,10 +15,12 @@ import java.util.Random;
 public class Tetris
 {
 	Stage stage;
-	private byte[][] stationaryStage = new byte[10][20];
-	private byte[][] fallingStage = new byte[10][20];
+	private byte[][] stationaryStage = new byte[10][21];
+	private byte[][] fallingStage = new byte[10][21];
 	private Tetromino currentFalling, nextFall;
-	private long freeTime = 1000, difficultyTime = 1000;
+	private long freeTime = 1000;
+	private int score = 0, level = 0, linesCleared = 0;
+	private boolean dropSpeedUp = false, gameOver = false;
 	static final int LEFT = -1, RIGHT = 1;
 
 	Event e = new ActionEvent();
@@ -82,6 +84,7 @@ public class Tetris
 		{
 			if (event.getCode() == KeyCode.DOWN)
 			{
+				dropSpeedUp = true;
 				freeTime = 50;
 			}
 		};
@@ -90,7 +93,8 @@ public class Tetris
 		{
 			if (event.getCode() == KeyCode.DOWN)
 			{
-				freeTime = difficultyTime;
+				dropSpeedUp = false;
+				freeTime = getDifficultyTime();
 			}
 		};
 
@@ -107,6 +111,31 @@ public class Tetris
 	public byte[][] getFallingStage()
 	{
 		return fallingStage;
+	}
+
+	public int getLinesCleared()
+	{
+		return linesCleared;
+	}
+
+	public int getLevel()
+	{
+		return level;
+	}
+
+	public int getScore()
+	{
+		return score;
+	}
+
+	public boolean isGameOver()
+	{
+		return gameOver;
+	}
+
+	public Tetromino getNextFall()
+	{
+		return nextFall;
 	}
 
 	private void init()
@@ -163,7 +192,7 @@ public class Tetris
 	{
 		for (int x = 0; x < 10; x++)
 		{
-			for (int y = 0; y < 20; y++)
+			for (int y = 0; y < 21; y++)
 			{
 				stage[x][y] = 0;
 			}
@@ -188,7 +217,7 @@ public class Tetris
 			new Thread(dropOnTimeZero).start();
 		} else
 		{
-			dropTimer.set(difficultyTime);
+			dropTimer.set(getDifficultyTime());
 			new Thread(setOnTimeZero).start();
 		}
 
@@ -202,7 +231,7 @@ public class Tetris
 			clearStage(fallingStage);
 			currentFalling.xPos += direction;
 			placeFalling();
-			dropTimer.set(freeTime);
+			dropTimer.set(getDifficultyTime());
 		}
 		displayStage();
 	}
@@ -257,9 +286,11 @@ public class Tetris
 
 	private void set(byte[][] tryTurn, Position p, int direction)
 	{
-		if(direction == RIGHT) {
+		if (direction == RIGHT)
+		{
 			currentFalling.intRotation();
-		} else if (direction == LEFT){
+		} else if (direction == LEFT)
+		{
 			currentFalling.decRotation();
 		}
 		currentFalling.tetromino = tryTurn;
@@ -273,6 +304,13 @@ public class Tetris
 		{
 			for (int x = 0; x < currentFalling.tetromino[0].length; x++)
 			{
+				if (stationaryStage[currentFalling.xPos + x][currentFalling.yPos + y] != 0 &&
+						currentFalling.tetromino[y][x] != 0)
+				{
+					gameOver = true;
+					displayStage();
+					return;
+				}
 				fallingStage[currentFalling.xPos + x][currentFalling.yPos + y]
 						= currentFalling.tetromino[y][x];
 			}
@@ -284,6 +322,11 @@ public class Tetris
 		long timer = dropTimer.get();
 		while (timer > 0)
 		{
+			if (dropSpeedUp)
+			{
+				timer = freeTime;
+				dropSpeedUp = false;
+			}
 			try
 			{
 				Thread.sleep(1);
@@ -299,6 +342,7 @@ public class Tetris
 
 	private Runnable setOnTimeZero = new Thread(() ->
 	{
+		dropTimer.set(getDifficultyTime());
 		while (dropTimer.get() > 0)
 		{
 			try
@@ -312,10 +356,13 @@ public class Tetris
 		}
 		if (!canFall())
 		{
-			freeTime = difficultyTime;
+			freeTime = getDifficultyTime();
 			fallToStat();
-			displayStage();
-			setupNextFall();
+			Platform.runLater(() ->
+			{
+				displayStage();
+				setupNextFall();
+			});
 		} else
 		{
 			new Thread(dropOnTimeZero).start();
@@ -405,7 +452,7 @@ public class Tetris
 	{
 		for (int x = 0; x < 10; x++)
 		{
-			for (int y = 0; y < 20; y++)
+			for (int y = 0; y < 21; y++)
 			{
 				if (fallingStage[x][y] != 0)
 				{
@@ -419,10 +466,10 @@ public class Tetris
 
 	private void checkClear()
 	{
-		int linesCleared = 0, lineOn = 19;
-		byte[][] newStat = new byte[10][20];
+		int linesCleared = 0, lineOn = 20;
+		byte[][] newStat = new byte[10][21];
 		clearStage(newStat);
-		for (int y = 19; y >= 0; y--)
+		for (int y = 20; y >= 0; y--)
 		{
 			int count = 0;
 			for (int x = 0; x < 10; x++)
@@ -445,5 +492,34 @@ public class Tetris
 			}
 		}
 		stationaryStage = newStat;
+		updateScore(linesCleared);
+	}
+
+	private void updateScore(int linesCleared)
+	{
+		this.linesCleared += linesCleared;
+		int n = level + 1;
+		switch (linesCleared)
+		{
+			case 4:
+				score += n * 1200;
+			case 3:
+				score += n * 300;
+			case 2:
+				score += n * 100;
+			case 1:
+				score += n * 40;
+		}
+		level = this.linesCleared / 10;
+	}
+
+	private long getDifficultyTime()
+	{
+		long t = 1000;
+		for (int i = 0; i < level; i++)
+		{
+			t *= 0.75;
+		}
+		return t;
 	}
 }
