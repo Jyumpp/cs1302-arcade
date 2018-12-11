@@ -1,21 +1,22 @@
 
 package cs1302.arcade;
 
-import java.util.Random;
-
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.stage.Modality;
 
+/**
+ * Main application class, that contains the main menu and launches each individual
+ * game when the respective button is pressed.
+ *
+ * @author Calvin Childress
+ * @author Hunter Halloran
+ * */
 public class ArcadeApp extends Application {
 
-    Random rng = new Random();
     public VBox vbox = null;
 
     @Override

@@ -4,13 +4,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 /**
- * This class creates the grid of the checkerboard, extends the rectangle class
- * in order to create the blocks with a usable value.
- * <p>
+ * This class creates the grid of the checkerboard, and contains the
+ * logic for getting and setting the respective pieces
+ * Extends Rectangle
  *
  * @author Calvin Childress
  * @author Hunter Halloran
- * </p>
  */
 //in progress 12:36am 12/4
 public class CheckersSquare extends Rectangle {
@@ -20,15 +19,18 @@ public class CheckersSquare extends Rectangle {
     /**
      * Default constructor to create the color and size of the squares for the
      * board
+     * @param dark boolean for if the previous square was dark, needed for alternating
+     * @param x x coord
+     * @param y y coord
      */
     public CheckersSquare(boolean dark, int x, int y) {
-        setHeight(100.0); //1/8th 0f 800
-        setWidth(100.0);
-        relocate(x * 100, y * 100);
+        setHeight(50.0); //found to be a good size that scaled well on multiple devices
+        setWidth(50.0);
+        relocate(x * 50, y * 50);
         if (dark) { //if the previous square was light, make the next dark
             setFill(Color.MAROON.darker()); //set square to brown
         } else {
-            setFill(Color.BEIGE); //otherwise set square to white
+            setFill(Color.BEIGE); //otherwise set square to beige
         }
     } //CheckersSquare
 
