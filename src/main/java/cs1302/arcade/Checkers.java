@@ -127,7 +127,7 @@ public class Checkers {
             int y0 = toBoard(piece.getOldY()); //gets old placement of y
             int x0 = toBoard(piece.getOldX()); //gets old placement of x
 
-           
+
             // KING--------
 //            if((newY == 7 && piece.getType() == CheckersType.RED) ||
 //                newY == 0 && piece.getType() == CheckersType.BLACK){
